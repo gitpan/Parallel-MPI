@@ -577,7 +577,7 @@ int MPIpm_packarray(void** buf, AV* array, MPI_Datatype datatype, int count) {
 	    sv_tmp = av_fetch(array, i, 0);
 	    n = htonl(SvCUR(*sv_tmp)+1);
 	    memcpy(t, &n, sizeof(int));
-	    memcpy(t+sizeof(int), SvPV(*sv_tmp, na), SvCUR(*sv_tmp)+1);
+	    memcpy(t+sizeof(int), SvPV(*sv_tmp, PL_na), SvCUR(*sv_tmp)+1);
 	    t += SvCUR(*sv_tmp)+1+sizeof(int);
 	}
 	return(len);
@@ -695,7 +695,7 @@ void MPIpm_packscalar(char* buf, SV* scalar, MPI_Datatype datatype) {
 #endif
 
   case MPI_CHAR:
-    memcpy(buf, SvPV(scalar, na), SvCUR(scalar));
+    memcpy(buf, SvPV(scalar, PL_na), SvCUR(scalar));
     *(char*)(buf + SvCUR(scalar)) = '\0';
     break;
 

@@ -4,6 +4,7 @@
 #include <mpi.h>
 
 #define MPI_STRING ((MPI_Datatype)34)
+/*#define  ARGV_DEBUG*/
 
 #ifdef FLOAT_HACK
 # undef MPI_FLOAT
@@ -15,8 +16,8 @@
 /* don't ask- mpicc hoses up these definitions */
 #undef VERSION
 #undef XS_VERSION
-#define VERSION "0.02"
-#define XS_VERSION "0.02"
+#define VERSION "0.03"
+#define XS_VERSION "0.03"
 
 MODULE = Parallel::MPI		PACKAGE = Parallel::MPI
 PROTOTYPES: DISABLE
@@ -72,8 +73,8 @@ MPI_Init()
 	    croak("Parallel::MPI: $0 not set. Oops");
 
         /* We can't run MPI from a -e or a - script. */
-	if(!strncmp(SvPV(argv0, na), "-", 1) ||
-           !strncmp(SvPV(argv0, na), "-e", 2))
+	if(!strncmp(SvPV(argv0, PL_na), "-", 1) ||
+           !strncmp(SvPV(argv0, PL_na), "-e", 2))
 	    croak("Parallel::MPI: Cannot use MPI with command line script");
  
 	/* debug */
@@ -81,7 +82,7 @@ MPI_Init()
 	printf("[%d] av_len=%d\n",getpid(),av_len(args_av));
  	for (i=0 ; i <= av_len(args_av) ; i++) {
 	    sv_tmp = av_fetch(args_av,i,0);
-	    printf("[%d] $ARGV[%d]=%s\n",getpid(),i,SvPV(*sv_tmp, na));
+	    printf("[%d] $ARGV[%d]=%s\n",getpid(),i,SvPV(*sv_tmp, PL_na));
 	}
 #endif
  
@@ -97,13 +98,13 @@ MPI_Init()
                during global destruction
 	    */
 	    argv = (char**) malloc((argc+1) * sizeof(char*));
-            argv[0] = strdup(SvPV(argv0, na));
+            argv[0] = strdup(SvPV(argv0, PL_na));
 	    for(i=1; i<argc; i++) {
 	        sv_tmp = av_fetch(args_av,i-1,0);
 	        if (sv_tmp == NULL) {
 		    argv[i] = NULL;
 	        } else {
-		    argv[i] = strdup(SvPV(*sv_tmp, na));
+		    argv[i] = strdup(SvPV(*sv_tmp, PL_na));
 	        }
             }
             argv[argc] = NULL; /* prevents coredumps */
@@ -152,7 +153,7 @@ MPI_Init()
 	    if (sv_tmp == NULL)
 		printf("[%d] $ARGV[%d]=undef\n",getpid(),i);
 	    else {
-		printf("[%d] $ARGV[%d]=%s\n",getpid(),i,SvPV(*sv_tmp, na));
+		printf("[%d] $ARGV[%d]=%s\n",getpid(),i,SvPV(*sv_tmp, PL_na));
 	    }
 	}
 #endif
@@ -202,7 +203,7 @@ MPI_Send(ref, count, datatype, dest, tag, comm)
 	    if (sv_tmp == NULL)
 		printf("[%d] $stuff[%d]=undef\n",getpid(),i);
 	    else {
-		printf("[%d] $stuff[%d]=%s\n",getpid(),i,SvPV(*sv_tmp, na));
+		printf("[%d] $stuff[%d]=%s\n",getpid(),i,SvPV(*sv_tmp, PL_na));
 	    }
 	}
 #endif /* SEND_DEBUG */
@@ -575,7 +576,8 @@ MPI_Sendrecv(sendref, sendcount, sendtype, dest, sendtag, recvref, recvcount, re
 	  sendbuf = (void*)malloc(MPIpm_bufsize(sendtype,SvRV(sendref),sendcount));
 	  recvbuf = (void*)malloc(MPIpm_bufsize(recvtype,SvRV(recvref),recvcount));
 	  MPIpm_packscalar(sendbuf,SvRV(sendref),sendtype);
-
+          MPIpm_packscalar(recvbuf,SvRV(recvref),recvtype);
+	  
 	  ret = MPI_Sendrecv(sendbuf, sendcount, sendtype, dest,
                              sendtag, recvbuf, recvcount, recvtype,
 			     source, recvtag, comm, &status);
