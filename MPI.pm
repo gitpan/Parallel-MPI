@@ -97,7 +97,7 @@ my @funcs =     qw(&MPI_Send
 %EXPORT_TAGS = ( all => [ keys %constants, @funcs ] );
 @EXPORT_OK = ( keys %constants, @funcs );
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -149,6 +149,7 @@ Parallel::MPI - Perl interface to the MPI message passing system
 
 =head1 DESCRIPTION
 
+The following is a summary of the available constants and functions:
 
 =head1 Error Handling
 
@@ -220,13 +221,13 @@ $Parallel::MPI::exceptions: if set, toss an exception when an error occurs.
    MPI_PROD   
    MPI_SUM    
    
-   Communities 
+   Communicators
    
    MPI_COMM_NULL
    MPI_COMM_SELF
    MPI_COMM_WORLD
    
-   Community and Group Comparisons
+   Communicator and Group Comparisons
    
    MPI_CONGRUENT 
    MPI_IDENT    
@@ -236,6 +237,31 @@ $Parallel::MPI::exceptions: if set, toss an exception when an error occurs.
 
 =head1 Exported functions
 
+   MPI_Init()
+   MPI_Finalize()
+   MPI_Initialized()
+
+   MPI_Comm_rank(communicator)
+   MPI_Comm_size(communicator)
+   
+   MPI_Send(\$message, length, datatype, destination, tag, communicator)
+   MPI_Recv(\$message, length, datatype, source, tag, communicator)
+   MPI_Sendrecv(\$message, length, datatype, destination, tag, communicator)
+   
+   MPI_Barrier(comm)
+   MPI_Bcast(\$from, count, datatype, root, communicator)
+ 
+   MPI_Wtime()
+   MPI_Wtick()
+
+   MPI_Abort(communicator, errorcode)
+
+   MPI_Reduce(\$from, \$to, count, datatype, operation, root, communicator)
+   MPI_Allreduce(\$from, \$to, count, datatype, operation, communicator)
+   MPI_Scatter(\$from, count, type, \$to, count, type, root, communicator)
+   MPI_Gather(\$from, count, type, \$to, count, type, root, communicator)
+
+
 =head1 AUTHORS
 
 Josh Wilmes and Chris Stevens
@@ -243,5 +269,7 @@ Josh Wilmes and Chris Stevens
 =head1 SEE ALSO
 
 MPI man pages.
+The paper, "Parallel::MPI - An MPI Binding for Perl", included in the
+  Parallel::MPI distribution
 
 =cut

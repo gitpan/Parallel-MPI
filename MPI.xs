@@ -15,8 +15,8 @@
 /* don't ask- mpicc hoses up these definitions */
 #undef VERSION
 #undef XS_VERSION
-#define VERSION "0.01"
-#define XS_VERSION "0.01"
+#define VERSION "0.02"
+#define XS_VERSION "0.02"
 
 MODULE = Parallel::MPI		PACKAGE = Parallel::MPI
 PROTOTYPES: DISABLE
